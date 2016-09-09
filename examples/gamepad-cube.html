@@ -4,8 +4,7 @@
 <meta charset=utf-8>
 <title>Gamepad Cube</title>
 <script src="https://cdn.rawgit.com/mrdoob/three.js/r74/build/three.min.js"></script>
-<script src="https://cdn.rawgit.com/mrdoob/three.js/r74/examples/js/loaders/MTLLoader.js"></script>
-<script src="https://cdn.rawgit.com/mrdoob/three.js/r74/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://cdn.rawgit.com/mrdoob/three.js/r74/examples/js/loaders/ColladaLoader.js"></script>
 <script src="../dist/altspace.min.js"></script>
 </head>
 <body>
@@ -37,11 +36,15 @@ GamepadCube = (function(){
 	}
 
 	function loadCubeModel() {
-		var loader = new altspace.utilities.shims.OBJMTLLoader();
-		var objFilename = "models/cube/cube-colored-faces.obj";
-		var mtlFilename = "models/cube/cube-colored-faces.mtl";
-		loader.load(objFilename, mtlFilename, function ( obj ) {
-			cubeModel = obj;
+		var loader = new THREE.ColladaLoader()
+		var objFilename = "models/boo.dae";
+		loader.load(objFilename, function ( obj ) {
+			cubeModel = obj.scene;
+			cubeModel.traverse(function (o) {
+					if (o.material && o.material.materials) {
+						o.material = o.material.materials[0];
+					}
+			});
 			onModelReady();
 		});
 	}
@@ -49,7 +52,8 @@ GamepadCube = (function(){
 	function createCube(initData) {
 
 		cube = cubeModel.clone();
-		cube.scale.multiplyScalar(15);
+		cube.scale.multiplyScalar(850);
+		cube.position.y = -1200;
 		cube.addBehaviors(
 			altspace.utilities.behaviors.Object3DSync({position: true, rotation: true, scale: true}),
 			altspace.utilities.behaviors.GamepadControls()
@@ -67,7 +71,7 @@ GamepadCube = (function(){
 		}
 	}
 
-	return { 
+	return {
 		main: main,
 		getCube: function(){ return cube; },
 	};
